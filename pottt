@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>Reminder App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Input form to create reminder -->
+    <form action="">
+        <label>Name:</label>
+        <input type="text" id="name" />
+        <label>Time:</label>
+        <input type="time" id="time" />
+        <label>Date:</label>
+        <input type="date" id="date" />
+        <button type="button" onclick="createReminder()">Create</button>
+    </form>
+    <!-- Overlay when reminder is reached -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-content">
+            <h3>Reminder Reached</h3>
+            <p id="reminder-content"></p>
+            <button type="button" onclick="closeOverlay()">Ok</button>
+        </div>
+    </div>
+    <!-- Button to show reminders -->
+    <button type="button" onclick="showReminders()">Show Reminders</button>
+    <!-- Unordered list to display reminders -->
+    <ul id="reminders"></ul>
+    <script>
+        // Array to store reminder objects
+        let reminders = [];
+        // Function to create reminder
+        function createReminder() {
+            // Check if max reminders have been reached
+            if (reminders.length == 3) {
+                alert('Max reminders reached!');
+                return;
+            }
+            // Get values from input fields
+            let name = document.getElementById('name').value;
+            let time = document.getElementById('time').value;
+            let date = document.getElementById('date').value;
+            // Create reminder object
+            let reminder = {
+                name: name,
+                time: time,
+                date: date
+            };
+            // Add reminder to array
+            reminders.push(reminder);
+            // Clear input fields
+            document.getElementById('name').value = '';
+            document.getElementById('time').value = '';
+            document.getElementById('date').value = '';
+            // Check if reminder has been reached
+            setTimeout(checkReminder, 1000);
+        }
+        // Function to cancel reminder
+        function cancelReminder(index) {
+            // Remove reminder from array
+            reminders.splice(index, 1);
+        }
+        // Function to show reminders
+        function showReminders() {
+            // Get reference to list element
+            let list = document.getElementById('reminders');
+            // Clear list
+            list.innerHTML = '';
+            // Loop through reminders
+            for(let i = 0; i < reminders.length; i++) {
+                // Get reminder
+                let reminder = reminders[i];
+                // Create list item element
+                let listItem = document.createElement('li');
+                // Create cancel button
+                let cancelBtn = document.createElement('button');
+                cancelBtn.innerHTML = 'Cancel';
+                cancelBtn.onclick = function() {
+                    cancelReminder(i);
+                    showReminders();
+                }
+                // Set list item content
+                listItem.innerHTML = reminder.name + ' at ' + reminder.time + ' on ' + reminder.date;
+                // Append cancel button to list item
+                listItem.appendChild(cancelBtn);
+                // Append list item to list
+                list.appendChild(listItem);
+            }
+        }
+        // Function to check if reminder has been reached
+        function checkReminder() {
+            // Get current date and time
+            let now = new Date();
+            // Loop through reminders
+            for(let i = 0; i < reminders.length; i++) {
+                // Get reminder
+                let reminder = reminders[i];
+
+                // Get reminder date and time
+                let reminderDateTime = new Date(reminder.date + ' ' + reminder.time);
+
+                // Check if reminder date and time is before current date and time
+                if (reminderDateTime <= now) {
+                    // Show reminder reached overlay
+                  document.getElementById('overlay').style.display = 'block';
+                    document.getElementById('reminder-content').innerHTML = reminder.name + ' at ' + reminder.time + ' on ' + reminder.date;
+                    // Remove reminder from array
+                    reminders.splice(i, 1);
+                }
+            }
+            // Call checkReminder function again after 1 second
+            setTimeout(checkReminder, 1000);
+        }
+        // Function to close overlay
+        function closeOverlay() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
